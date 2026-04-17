@@ -1,0 +1,732 @@
+﻿{
+    "app_name":  "academic_integrity_sanctions_matrix",
+    "version":  "1.0",
+    "description":  "Sistema de apoyo para valorar faltas a la integridad académica y sugerir sanciones formativas, académicas y punitivas según una matriz de puntajes y reglas automáticas.",
+    "calculation":  {
+                        "formula":  "total_score = offense.base_score + sum(selected_factor_option.score)",
+                        "notes":  [
+                                      "La decisión final siempre debe ser revisada por una persona.",
+                                      "El sistema sugiere sanciones; no reemplaza el juicio institucional.",
+                                      "Las reglas automáticas pueden forzar derivación o restringir ciertas sanciones."
+                                  ]
+                    },
+    "score_ranges":  [
+                         {
+                             "id":  "R1",
+                             "min":  0,
+                             "max":  19,
+                             "label":  "Bajo",
+                             "response_type":  "Formativa"
+                         },
+                         {
+                             "id":  "R2",
+                             "min":  20,
+                             "max":  39,
+                             "label":  "Medio",
+                             "response_type":  "Formativa + académica leve"
+                         },
+                         {
+                             "id":  "R3",
+                             "min":  40,
+                             "max":  59,
+                             "label":  "Medio-alto",
+                             "response_type":  "Mixta"
+                         },
+                         {
+                             "id":  "R4",
+                             "min":  60,
+                             "max":  79,
+                             "label":  "Alto",
+                             "response_type":  "Punitiva + formativa"
+                         },
+                         {
+                             "id":  "R5",
+                             "min":  80,
+                             "max":  999,
+                             "label":  "Muy alto",
+                             "response_type":  "Punitiva grave + derivación"
+                         }
+                     ],
+    "offenses":  [
+                     {
+                         "id":  "F1",
+                         "name":  "Error de citación o uso incorrecto de fuentes",
+                         "base_level":  "Leve",
+                         "base_score":  10,
+                         "mandatory_referral":  false,
+                         "notes":  "Aplica cuando no hay evidencia clara de intención."
+                     },
+                     {
+                         "id":  "F2",
+                         "name":  "Colaboración indebida menor",
+                         "base_level":  "Leve",
+                         "base_score":  10,
+                         "mandatory_referral":  false,
+                         "notes":  "Trabajo parcialmente compartido o apoyo no permitido de bajo impacto."
+                     },
+                     {
+                         "id":  "F3",
+                         "name":  "Uso no autorizado de IA de impacto limitado",
+                         "base_level":  "Leve",
+                         "base_score":  10,
+                         "mandatory_referral":  false,
+                         "notes":  "No afecta el núcleo del producto evaluado."
+                     },
+                     {
+                         "id":  "F4",
+                         "name":  "Plagio parcial",
+                         "base_level":  "Moderada",
+                         "base_score":  20,
+                         "mandatory_referral":  false,
+                         "notes":  "Incluye fragmentos relevantes sin atribución adecuada."
+                     },
+                     {
+                         "id":  "F5",
+                         "name":  "Uso no autorizado de IA de impacto relevante",
+                         "base_level":  "Moderada",
+                         "base_score":  20,
+                         "mandatory_referral":  false,
+                         "notes":  "Afecta contenido central o evaluable."
+                     },
+                     {
+                         "id":  "F6",
+                         "name":  "Copia en evaluación",
+                         "base_level":  "Moderada",
+                         "base_score":  20,
+                         "mandatory_referral":  false,
+                         "notes":  "Durante prueba, examen o evaluación equivalente."
+                     },
+                     {
+                         "id":  "F7",
+                         "name":  "Reutilización indebida de trabajo propio",
+                         "base_level":  "Moderada",
+                         "base_score":  20,
+                         "mandatory_referral":  false,
+                         "notes":  "Sin autorización explícita."
+                     },
+                     {
+                         "id":  "F8",
+                         "name":  "Plagio total",
+                         "base_level":  "Grave",
+                         "base_score":  35,
+                         "mandatory_referral":  true,
+                         "notes":  "El trabajo completo o sustancialmente completo no es original."
+                     },
+                     {
+                         "id":  "F9",
+                         "name":  "Fabricación o manipulación de datos",
+                         "base_level":  "Grave",
+                         "base_score":  35,
+                         "mandatory_referral":  true,
+                         "notes":  "Incluye invención, alteración o supresión de datos."
+                     },
+                     {
+                         "id":  "F10",
+                         "name":  "Suplantación de identidad",
+                         "base_level":  "Muy grave",
+                         "base_score":  50,
+                         "mandatory_referral":  true,
+                         "notes":  "Otra persona actúa en nombre del estudiante o viceversa."
+                     },
+                     {
+                         "id":  "F11",
+                         "name":  "Falsificación documental",
+                         "base_level":  "Muy grave",
+                         "base_score":  50,
+                         "mandatory_referral":  true,
+                         "notes":  "Incluye firmas, certificados o documentos alterados."
+                     },
+                     {
+                         "id":  "F12",
+                         "name":  "Obstrucción o engaño durante la investigación",
+                         "base_level":  "Muy grave",
+                         "base_score":  50,
+                         "mandatory_referral":  true,
+                         "notes":  "Oculta, destruye o altera evidencia."
+                     }
+                 ],
+    "factors":  [
+                    {
+                        "id":  "intentionality",
+                        "name":  "Intencionalidad",
+                        "type":  "modifier",
+                        "definition":  "Grado en que la conducta parece haber sido realizada por error, descuido, decisión deliberada o planificación previa.",
+                        "purpose":  "Distinguir entre una acción accidental o por desconocimiento y una conducta conscientemente orientada a infringir una norma.",
+                        "options":  [
+                                        {
+                                            "id":  "intentionality_1",
+                                            "label":  "No evidente o error",
+                                            "score":  0,
+                                            "description":  "No hay elementos claros que indiquen voluntad de infringir la norma."
+                                        },
+                                        {
+                                            "id":  "intentionality_2",
+                                            "label":  "Negligencia",
+                                            "score":  5,
+                                            "description":  "Hubo omisión de cuidado, pero no necesariamente intención directa de obtener ventaja indebida."
+                                        },
+                                        {
+                                            "id":  "intentionality_3",
+                                            "label":  "Intencional",
+                                            "score":  10,
+                                            "description":  "La conducta parece deliberada."
+                                        },
+                                        {
+                                            "id":  "intentionality_4",
+                                            "label":  "Premeditado",
+                                            "score":  15,
+                                            "description":  "La conducta requirió preparación, organización previa o uso deliberado de medios para concretarla."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "academic_impact",
+                        "name":  "Impacto académico",
+                        "type":  "modifier",
+                        "definition":  "Nivel en que la conducta afecta la validez, autenticidad, justicia o confiabilidad de la evaluación o del producto académico presentado.",
+                        "purpose":  "Valorar cuánto compromete la falta el sentido académico de la evaluación o del trabajo entregado.",
+                        "options":  [
+                                        {
+                                            "id":  "academic_impact_1",
+                                            "label":  "Incumplimiento de formalidades",
+                                            "score":  0,
+                                            "description":  "La falta afecta aspectos periféricos o formales, pero no altera de manera sustantiva el logro evaluado."
+                                        },
+                                        {
+                                            "id":  "academic_impact_2",
+                                            "label":  "Afecta el proceso de aprendizaje",
+                                            "score":  8,
+                                            "description":  "La falta compromete parcialmente la validez del trabajo o evaluación."
+                                        },
+                                        {
+                                            "id":  "academic_impact_3",
+                                            "label":  "Impide el aprendizaje",
+                                            "score":  15,
+                                            "description":  "La falta compromete de manera importante el sentido de la evaluación o del producto entregado."
+                                        },
+                                        {
+                                            "id":  "academic_impact_4",
+                                            "label":  "Fraude o suplantación",
+                                            "score":  25,
+                                            "description":  "La falta invalida sustancial o completamente la evaluación o el producto académico."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "third_party_impact",
+                        "name":  "Impacto en terceros",
+                        "type":  "modifier",
+                        "definition":  "Grado en que la conducta afecta a otras personas, al grupo, a la equidad entre estudiantes o a la confianza institucional.",
+                        "purpose":  "Considerar no solo el efecto sobre la nota, sino también el daño relacional o comunitario.",
+                        "options":  [
+                                        {
+                                            "id":  "third_party_impact_1",
+                                            "label":  "Sin impacto claro",
+                                            "score":  0,
+                                            "description":  "No se identifican afectaciones relevantes a otras personas o al entorno académico."
+                                        },
+                                        {
+                                            "id":  "third_party_impact_2",
+                                            "label":  "Afecta equidad entre pares",
+                                            "score":  5,
+                                            "description":  "La conducta altera la igualdad de condiciones respecto de otros estudiantes."
+                                        },
+                                        {
+                                            "id":  "third_party_impact_3",
+                                            "label":  "Afecta comunidad o institución",
+                                            "score":  10,
+                                            "description":  "La conducta daña la confianza institucional o el funcionamiento de la comunidad."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "recidivism",
+                        "name":  "Reincidencia",
+                        "type":  "modifier",
+                        "definition":  "Existencia de antecedentes previos del estudiante en faltas a la integridad académica, especialmente cuando son similares o reiteradas.",
+                        "purpose":  "Incorporar la reiteración como criterio relevante en la valoración del caso.",
+                        "options":  [
+                                        {
+                                            "id":  "recidivism_1",
+                                            "label":  "Sin antecedentes",
+                                            "score":  0,
+                                            "description":  "No registra faltas previas."
+                                        },
+                                        {
+                                            "id":  "recidivism_2",
+                                            "label":  "Antecedente leve",
+                                            "score":  10,
+                                            "description":  "Existe un antecedente aislado y de baja gravedad."
+                                        },
+                                        {
+                                            "id":  "recidivism_3",
+                                            "label":  "Reincidencia similar",
+                                            "score":  20,
+                                            "description":  "Ya ha incurrido anteriormente en una falta comparable."
+                                        },
+                                        {
+                                            "id":  "recidivism_4",
+                                            "label":  "Múltiples antecedentes",
+                                            "score":  30,
+                                            "description":  "Presenta más de un antecedente o un patrón reiterado."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "acknowledgement",
+                        "name":  "Reconocimiento y colaboración",
+                        "type":  "modifier",
+                        "definition":  "Grado en que el estudiante reconoce los hechos, coopera en su esclarecimiento y participa de forma honesta en el proceso de revisión.",
+                        "purpose":  "Valorar si existe disposición al reconocimiento y a la colaboración durante el análisis del caso.",
+                        "options":  [
+                                        {
+                                            "id":  "acknowledgement_1",
+                                            "label":  "Reconoce y colabora",
+                                            "score":  -10,
+                                            "description":  "Admite los hechos y coopera de manera abierta y consistente."
+                                        },
+                                        {
+                                            "id":  "acknowledgement_2",
+                                            "label":  "Reconoce parcialmente",
+                                            "score":  -5,
+                                            "description":  "Admite algunos aspectos, pero no de forma completa."
+                                        },
+                                        {
+                                            "id":  "acknowledgement_3",
+                                            "label":  "Niega",
+                                            "score":  0,
+                                            "description":  "No admite responsabilidad, sin que ello implique obstrucción."
+                                        },
+                                        {
+                                            "id":  "acknowledgement_4",
+                                            "label":  "Engaña u oculta",
+                                            "score":  10,
+                                            "description":  "Entrega información engañosa, oculta antecedentes o dificulta la revisión."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "student_year",
+                        "name":  "Año del estudiante",
+                        "type":  "modifier",
+                        "definition":  "Etapa de avance curricular del estudiante al momento de ocurrida la falta.",
+                        "purpose":  "Considerar el grado esperado de familiaridad con normas académicas e institucionales.",
+                        "options":  [
+                                        {
+                                            "id":  "student_year_1",
+                                            "label":  "Primer año",
+                                            "score":  -5,
+                                            "description":  "Ingreso reciente al sistema universitario."
+                                        },
+                                        {
+                                            "id":  "student_year_2",
+                                            "label":  "Segundo año",
+                                            "score":  0,
+                                            "description":  "Etapa inicial con mayor experiencia que primer año."
+                                        },
+                                        {
+                                            "id":  "student_year_3",
+                                            "label":  "Tercer año",
+                                            "score":  5,
+                                            "description":  "Etapa intermedia."
+                                        },
+                                        {
+                                            "id":  "student_year_4",
+                                            "label":  "Cuarto año",
+                                            "score":  10,
+                                            "description":  "Etapa avanzada con mayor familiaridad esperada con las normas."
+                                        },
+                                        {
+                                            "id":  "student_year_5",
+                                            "label":  "Quinto año o más",
+                                            "score":  15,
+                                            "description":  "Tramo avanzado o final de la formación."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "clinical_context",
+                        "name":  "Contexto clínico",
+                        "type":  "modifier",
+                        "definition":  "Indica si la falta ocurrió en una actividad clínica, práctica clínica o contexto equivalente de atención, cuidado o interacción supervisada con personas.",
+                        "purpose":  "Considerar la mayor sensibilidad académica, ética y profesional de las faltas cometidas en contextos clínicos.",
+                        "options":  [
+                                        {
+                                            "id":  "clinical_context_1",
+                                            "label":  "No",
+                                            "score":  0,
+                                            "description":  "La falta no ocurrió en un contexto clínico."
+                                        },
+                                        {
+                                            "id":  "clinical_context_2",
+                                            "label":  "Sí",
+                                            "score":  20,
+                                            "description":  "La falta ocurrió en un contexto clínico o práctica clínica."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "benefit_obtained",
+                        "name":  "Beneficio obtenido",
+                        "type":  "modifier",
+                        "definition":  "Grado en que la conducta permitió o buscó permitir una ventaja académica indebida.",
+                        "purpose":  "Valorar si existió intento o logro efectivo de una ventaja injusta.",
+                        "options":  [
+                                        {
+                                            "id":  "benefit_obtained_1",
+                                            "label":  "No obtuvo beneficio",
+                                            "score":  0,
+                                            "description":  "No se aprecia una ventaja académica relevante buscada o conseguida."
+                                        },
+                                        {
+                                            "id":  "benefit_obtained_2",
+                                            "label":  "Intentó obtener beneficio",
+                                            "score":  5,
+                                            "description":  "La conducta buscó generar una ventaja, aunque no necesariamente se concretó."
+                                        },
+                                        {
+                                            "id":  "benefit_obtained_3",
+                                            "label":  "Obtuvo beneficio claro",
+                                            "score":  10,
+                                            "description":  "La conducta produjo una ventaja académica indebida concreta."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "rule_clarity",
+                        "name":  "Claridad de la norma",
+                        "type":  "modifier",
+                        "definition":  "Nivel en que la regla presuntamente infringida había sido comunicada de forma clara, explícita y comprensible al estudiante.",
+                        "purpose":  "Moderar la valoración cuando las instrucciones o normas no fueron suficientemente claras.",
+                        "options":  [
+                                        {
+                                            "id":  "rule_clarity_1",
+                                            "label":  "Ambigua",
+                                            "score":  -5,
+                                            "description":  "La norma no estaba claramente explicitada o podía prestarse para interpretaciones."
+                                        },
+                                        {
+                                            "id":  "rule_clarity_2",
+                                            "label":  "General",
+                                            "score":  0,
+                                            "description":  "La regla es conocida en términos generales, pero no fue reforzada de manera específica en esa evaluación o actividad."
+                                        },
+                                        {
+                                            "id":  "rule_clarity_3",
+                                            "label":  "Explícita",
+                                            "score":  10,
+                                            "description":  "La regla fue comunicada de forma directa y comprensible."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "evidence_strength",
+                        "name":  "Solidez de la evidencia",
+                        "type":  "rule_input",
+                        "definition":  "Grado de consistencia, suficiencia y respaldo de los antecedentes disponibles para sustentar la falta reportada.",
+                        "purpose":  "Restringir o habilitar ciertas respuestas según la calidad de la evidencia.",
+                        "options":  [
+                                        {
+                                            "id":  "evidence_strength_1",
+                                            "label":  "Insuficiente",
+                                            "score":  0,
+                                            "description":  "Los antecedentes disponibles no permiten sustentar con firmeza la falta."
+                                        },
+                                        {
+                                            "id":  "evidence_strength_2",
+                                            "label":  "Parcial",
+                                            "score":  0,
+                                            "description":  "Hay indicios, pero no respaldo completo."
+                                        },
+                                        {
+                                            "id":  "evidence_strength_3",
+                                            "label":  "Suficiente",
+                                            "score":  0,
+                                            "description":  "Los antecedentes permiten sustentar razonablemente la falta."
+                                        },
+                                        {
+                                            "id":  "evidence_strength_4",
+                                            "label":  "Robusta",
+                                            "score":  0,
+                                            "description":  "Existe respaldo claro, consistente y suficiente."
+                                        }
+                                    ]
+                    },
+                    {
+                        "id":  "critical_context",
+                        "name":  "Contexto crítico",
+                        "type":  "rule_input",
+                        "definition":  "Presencia de circunstancias en las que la falta adquiere especial gravedad por involucrar riesgos profesionales, éticos, institucionales o de seguridad.",
+                        "purpose":  "Activar restricciones o revisión obligatoria en situaciones especialmente sensibles.",
+                        "options":  [
+                                        {
+                                            "id":  "critical_context_1",
+                                            "label":  "No",
+                                            "score":  0,
+                                            "description":  "No se identifican circunstancias críticas adicionales."
+                                        },
+                                        {
+                                            "id":  "critical_context_2",
+                                            "label":  "Sí",
+                                            "score":  0,
+                                            "description":  "La falta ocurre en un contexto especialmente sensible, como práctica profesional, investigación con datos sensibles o documentación oficial."
+                                        }
+                                    ]
+                    }
+                ],
+    "sanctions":  [
+                      {
+                          "id":  "S1",
+                          "name":  "Actividad reflexiva",
+                          "category":  "Formativa",
+                          "description":  "Ensayo, mapa mental u otra actividad de reflexión guiada.",
+                          "score_min":  0,
+                          "score_max":  999
+                      },
+                      {
+                          "id":  "S2",
+                          "name":  "Taller de integridad académica",
+                          "category":  "Formativa",
+                          "description":  "Participación en una actividad formativa institucional.",
+                          "score_min":  0,
+                          "score_max":  999
+                      },
+                      {
+                          "id":  "S3",
+                          "name":  "Entrevista reflexiva",
+                          "category":  "Formativa",
+                          "description":  "Instancia de conversación guiada con docente o unidad correspondiente.",
+                          "score_min":  0,
+                          "score_max":  60
+                      },
+                      {
+                          "id":  "S4",
+                          "name":  "Rehacer evaluación con condiciones",
+                          "category":  "Formativa",
+                          "description":  "Nueva oportunidad evaluativa bajo reglas definidas.",
+                          "score_min":  0,
+                          "score_max":  40
+                      },
+                      {
+                          "id":  "S5",
+                          "name":  "Plan de apoyo académico",
+                          "category":  "Formativa",
+                          "description":  "Derivación a apoyo en escritura, citación u otras habilidades.",
+                          "score_min":  0,
+                          "score_max":  60
+                      },
+                      {
+                          "id":  "S6",
+                          "name":  "Descuento de puntaje",
+                          "category":  "Académica",
+                          "description":  "Reducción parcial de la calificación.",
+                          "score_min":  20,
+                          "score_max":  60
+                      },
+                      {
+                          "id":  "S7",
+                          "name":  "Nota mínima en evaluación",
+                          "category":  "Académica",
+                          "description":  "Asignación de nota mínima en la actividad afectada.",
+                          "score_min":  30,
+                          "score_max":  70
+                      },
+                      {
+                          "id":  "S8",
+                          "name":  "Anulación de evaluación",
+                          "category":  "Académica",
+                          "description":  "La evaluación queda sin efecto.",
+                          "score_min":  40,
+                          "score_max":  80
+                      },
+                      {
+                          "id":  "S9",
+                          "name":  "Reprobación de asignatura",
+                          "category":  "Punitiva",
+                          "description":  "Consecuencia académica grave aplicable según normativa.",
+                          "score_min":  60,
+                          "score_max":  999
+                      },
+                      {
+                          "id":  "S10",
+                          "name":  "Registro formal de falta",
+                          "category":  "Punitiva",
+                          "description":  "Registro institucional del caso.",
+                          "score_min":  40,
+                          "score_max":  999
+                      },
+                      {
+                          "id":  "S11",
+                          "name":  "Derivación a comité disciplinario",
+                          "category":  "Punitiva",
+                          "description":  "Escalamiento formal a instancia superior.",
+                          "score_min":  50,
+                          "score_max":  999
+                      },
+                      {
+                          "id":  "S12",
+                          "name":  "Suspensión de beneficios académicos",
+                          "category":  "Punitiva",
+                          "description":  "Aplicable según normativa institucional.",
+                          "score_min":  70,
+                          "score_max":  999
+                      }
+                  ],
+    "automatic_rules":  [
+                            {
+                                "id":  "AR1",
+                                "name":  "Derivación obligatoria por tipo de falta",
+                                "if":  {
+                                           "offense_ids":  [
+                                                               "F8",
+                                                               "F9",
+                                                               "F10",
+                                                               "F11",
+                                                               "F12"
+                                                           ]
+                                       },
+                                "then":  {
+                                             "force_include_sanctions":  [
+                                                                             "S11"
+                                                                         ],
+                                             "set_review_required":  true
+                                         }
+                            },
+                            {
+                                "id":  "AR2",
+                                "name":  "Derivación obligatoria por reincidencia alta",
+                                "if":  {
+                                           "factor":  "recidivism",
+                                           "option_ids":  [
+                                                              "recidivism_3",
+                                                              "recidivism_4"
+                                                          ]
+                                       },
+                                "then":  {
+                                             "force_include_sanctions":  [
+                                                                             "S11"
+                                                                         ],
+                                             "set_review_required":  true
+                                         }
+                            },
+                            {
+                                "id":  "AR3",
+                                "name":  "Toda falta requiere componente formativo",
+                                "if":  {
+                                           "any_confirmed_case":  true
+                                       },
+                                "then":  {
+                                             "force_include_one_of":  [
+                                                                          "S1",
+                                                                          "S2"
+                                                                      ]
+                                         }
+                            },
+                            {
+                                "id":  "AR4",
+                                "name":  "Evidencia insuficiente restringe sanciones punitivas altas",
+                                "if":  {
+                                           "factor":  "evidence_strength",
+                                           "option_ids":  [
+                                                              "evidence_strength_1"
+                                                          ]
+                                       },
+                                "then":  {
+                                             "block_sanctions":  [
+                                                                     "S9",
+                                                                     "S11",
+                                                                     "S12"
+                                                                 ]
+                                         }
+                            },
+                            {
+                                "id":  "AR5",
+                                "name":  "Contexto crítico impide resolución solo formativa",
+                                "if":  {
+                                           "factor":  "critical_context",
+                                           "option_ids":  [
+                                                              "critical_context_2"
+                                                          ]
+                                       },
+                                "then":  {
+                                             "require_non_formative_sanction":  true,
+                                             "set_review_required":  true
+                                         }
+                            }
+                        ],
+    "case_form":  {
+                      "fields":  [
+                                     {
+                                         "id":  "case_id",
+                                         "label":  "ID del caso",
+                                         "type":  "text",
+                                         "required":  true
+                                     },
+                                     {
+                                         "id":  "date",
+                                         "label":  "Fecha",
+                                         "type":  "date",
+                                         "required":  true
+                                     },
+                                     {
+                                         "id":  "course",
+                                         "label":  "Curso o asignatura",
+                                         "type":  "text",
+                                         "required":  true
+                                     },
+                                     {
+                                         "id":  "reporting_teacher",
+                                         "label":  "Docente que reporta",
+                                         "type":  "text",
+                                         "required":  true
+                                     },
+                                     {
+                                         "id":  "student_name",
+                                         "label":  "Estudiante",
+                                         "type":  "text",
+                                         "required":  true
+                                     },
+                                     {
+                                         "id":  "description",
+                                         "label":  "Descripción del hecho",
+                                         "type":  "textarea",
+                                         "required":  true
+                                     },
+                                     {
+                                         "id":  "offense_id",
+                                         "label":  "Tipo de falta",
+                                         "type":  "select",
+                                         "required":  true,
+                                         "source":  "offenses"
+                                     },
+                                     {
+                                         "id":  "evidence_summary",
+                                         "label":  "Resumen de evidencia",
+                                         "type":  "textarea",
+                                         "required":  false
+                                     },
+                                     {
+                                         "id":  "notes",
+                                         "label":  "Observaciones",
+                                         "type":  "textarea",
+                                         "required":  false
+                                     }
+                                 ]
+                  },
+    "output":  {
+                   "fields":  [
+                                  "selected_offense",
+                                  "base_score",
+                                  "selected_factors",
+                                  "total_score",
+                                  "score_range",
+                                  "recommended_sanctions",
+                                  "alternative_sanctions",
+                                  "blocked_sanctions",
+                                  "automatic_rules_triggered",
+                                  "review_required",
+                                  "justification"
+                              ],
+                   "justification_template":  "La recomendación se basa en la falta seleccionada, el puntaje base, los factores de valoración aplicados, el tramo de puntaje alcanzado y las reglas automáticas activadas. La decisión final debe ser revisada por la autoridad correspondiente."
+               }
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Matriz de integridad académica</title>
+    <link rel="stylesheet" href="src/styles.css">
+  </head>
+  <body>
+    <header>
+      <h1>Matriz de apoyo para decisiones sobre integridad académica</h1>
+      <p class="notice">
+        Esta herramienta entrega una recomendación orientativa. No reemplaza la revisión humana ni la normativa institucional aplicable.
+      </p>
+    </header>
+
+    <main>
+      <section>
+        <h2>Configuración</h2>
+        <div class="toolbar">
+          <button id="load-example" type="button" class="secondary">Cargar caso de ejemplo</button>
+          <label>
+            Reemplazar configuración JSON
+            <input id="config-file" type="file" accept="application/json">
+          </label>
+        </div>
+        <p id="config-status" class="field-note"></p>
+      </section>
+
+      <section>
+        <h2>Datos del caso</h2>
+        <div id="case-fields" class="grid"></div>
+      </section>
+
+      <section>
+        <h2>Selección de falta</h2>
+        <div id="offense-section"></div>
+      </section>
+
+      <section>
+        <h2>Factores de valoración</h2>
+        <p class="muted">Cada factor admite una sola opción. Los factores de tipo regla no suman puntaje.</p>
+        <div id="factor-fields" class="grid"></div>
+      </section>
+
+      <section>
+        <h2>Resultado del cálculo</h2>
+        <div id="validation-errors" class="error-list"></div>
+        <div id="score-output"></div>
+        <p id="review-flag" class="review-flag hidden">Revisión requerida</p>
+        <h3>Justificación automática</h3>
+        <p id="justification-output"></p>
+      </section>
+
+      <section>
+        <h2>Sanciones sugeridas</h2>
+        <p class="muted">Las sanciones se filtran por rango de puntaje y luego se ajustan con las reglas automáticas.</p>
+        <div id="sanction-output" class="grid"></div>
+      </section>
+
+      <section>
+        <h2>Decisión final</h2>
+        <div class="grid">
+          <label>
+            Decisión final
+            <textarea id="final-decision" placeholder="Registre la decisión adoptada por la persona o instancia competente."></textarea>
+          </label>
+          <label>
+            Sanciones aplicadas finalmente
+            <select id="final-sanctions" multiple size="8"></select>
+            <span class="field-note">Use Ctrl o Cmd para seleccionar varias.</span>
+          </label>
+          <label>
+            Observaciones
+            <textarea id="final-observations" placeholder="Explique diferencias respecto de la recomendación, antecedentes adicionales o criterios humanos aplicados."></textarea>
+          </label>
+        </div>
+        <div class="toolbar">
+          <button id="export-pdf" type="button">Exportar resultado PDF</button>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
