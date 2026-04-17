@@ -1,12 +1,12 @@
 :root {
   color-scheme: light;
-  --ink: #202124;
-  --muted: #5f6368;
-  --line: #d7dce0;
+  --ink: #003652;
+  --muted: #486675;
+  --line: #b9d8dd;
   --panel: #ffffff;
-  --soft: #f5f7f8;
-  --accent: #176b5d;
-  --accent-2: #9b2f45;
+  --soft: #eefafa;
+  --accent: #00B2BA;
+  --accent-2: #003652;
   --warn: #b45309;
   --blocked: #7f1d1d;
 }
@@ -19,7 +19,7 @@ body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   color: var(--ink);
-  background: #eef2f3;
+  background: #eef7f8;
   line-height: 1.45;
 }
 
@@ -41,6 +41,11 @@ h3 {
 
 h1 {
   font-size: 1.7rem;
+  color: var(--accent-2);
+}
+
+h2 {
+  color: var(--accent-2);
 }
 
 h2 {
@@ -64,8 +69,8 @@ section {
 }
 
 .notice {
-  background: #fff7ed;
-  border-left: 5px solid var(--warn);
+  background: #e6fbfc;
+  border-left: 5px solid var(--accent);
   padding: 12px;
 }
 
@@ -105,6 +110,13 @@ textarea {
   background: #fff;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  outline: 2px solid rgba(0, 178, 186, 0.2);
+}
+
 textarea {
   min-height: 92px;
   resize: vertical;
@@ -116,13 +128,14 @@ button {
   border-radius: 6px;
   padding: 10px 14px;
   background: var(--accent);
-  color: white;
+  color: #003652;
   cursor: pointer;
   font-weight: 700;
 }
 
 button.secondary {
-  background: #455a64;
+  background: var(--accent-2);
+  color: #fff;
 }
 
 .field-note,
@@ -180,8 +193,8 @@ button.secondary {
   margin: 4px 4px 0 0;
   font-size: 0.82rem;
   font-weight: 700;
-  background: #dde7e4;
-  color: #164e43;
+  background: #d8f6f8;
+  color: #003652;
 }
 
 .tag.blocked {
@@ -195,8 +208,8 @@ button.secondary {
 }
 
 .tag.required {
-  background: #e0f2fe;
-  color: #075985;
+  background: #d8f6f8;
+  color: #003652;
 }
 
 .sanction.blocked {

@@ -52,14 +52,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadExampleCase();
     calculateAndRender();
   } catch (error) {
-    document.querySelector("#config-status").textContent = error.message;
+    document.querySelector("#validation-errors").textContent = error.message;
   }
 
-  document.querySelector("#load-example").addEventListener("click", () => {
-    loadExampleCase();
-    calculateAndRender();
-  });
-  document.querySelector("#config-file").addEventListener("change", handleConfigUpload);
   document.querySelector("#export-pdf").addEventListener("click", exportResultPdf);
 });
 
@@ -88,7 +83,6 @@ function renderApp() {
   renderOffenseSelector();
   renderFactorFields();
   renderFinalSanctionOptions();
-  document.querySelector("#config-status").textContent = `Configuración cargada: ${config.app_name ?? "sin nombre"} v${config.version ?? "s/v"}.`;
 }
 
 function renderCaseFields() {
@@ -397,23 +391,6 @@ function loadExampleCase() {
   state.caseData = { ...state.caseData, ...exampleCase.caseData };
   state.offenseId = exampleCase.offenseId;
   state.selectedFactors = { ...state.selectedFactors, ...exampleCase.selectedFactors };
-}
-
-async function handleConfigUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  try {
-    const uploadedConfig = JSON.parse(await file.text());
-    validateConfig(uploadedConfig);
-    config = uploadedConfig;
-    initializeStateFromConfig();
-    renderApp();
-    calculateAndRender();
-    document.querySelector("#config-status").textContent = `Configuración externa cargada: ${file.name}.`;
-  } catch (error) {
-    document.querySelector("#config-status").textContent = `No se pudo cargar el JSON: ${error.message}`;
-  }
 }
 
 function getHumanFinalDecision() {
